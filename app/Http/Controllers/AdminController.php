@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Feedback;
 use App\Models\Ppdb;
 use App\Models\Berita;
+use App\Models\PpdbSetting;
 use App\Exports\PpdbExport;
 use App\Exports\FeedbackExport;
 use Illuminate\Http\Request;
@@ -200,6 +201,33 @@ class AdminController extends Controller
 
         return redirect()->route('admin.berita')
             ->with('success', 'Berita berhasil dihapus');
+    }
+
+    /**
+     * Menampilkan halaman kuota PPDB
+     */
+    public function ppdbQuota()
+    {
+        $setting = PpdbSetting::orderByDesc('id')->first();
+        return view('admin.ppdb-quota', compact('setting'));
+    }
+
+    /**
+     * Proses update kuota PPDB
+     */
+    public function updatePpdbQuota(Request $request)
+    {
+        $request->validate([
+            'tahun_ajaran' => 'required',
+            'kuota' => 'required|integer|min:1',
+        ]);
+        $setting = PpdbSetting::orderByDesc('id')->first();
+        if ($setting) {
+            $setting->update($request->only(['tahun_ajaran', 'kuota']));
+        } else {
+            PpdbSetting::create($request->only(['tahun_ajaran', 'kuota']));
+        }
+        return redirect()->back()->with('success', 'Kuota PPDB berhasil diperbarui!');
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Feedback;
 use App\Models\Ppdb;
 use App\Models\Berita;
+use App\Models\PpdbSetting;
 use Illuminate\Http\Request;
 
 class AssalamController extends Controller
@@ -56,16 +57,38 @@ class AssalamController extends Controller
     // Simpan data PPDB
     public function storePpdb(Request $request)
     {
+        // Cek kuota
+        $setting = PpdbSetting::orderByDesc('id')->first();
+        $kuota = $setting ? $setting->kuota : null;
+        $tahun_ajaran = $setting ? $setting->tahun_ajaran : null;
+        $pendaftar = $tahun_ajaran ? Ppdb::where('created_at', '>=', now()->startOfYear())->count() : 0;
+        if ($kuota && $pendaftar >= $kuota) {
+            return redirect()->back()->withErrors(['Kuota pendaftaran sudah penuh.'])->withInput();
+        }
         $request->validate([
             'nama_lengkap' => 'required',
-            'email' => 'required|email',
-            'no_hp' => 'required',
-            'alamat' => 'required',
-            'asal_sekolah' => 'required',
+            'nisn' => 'required',
+            'asal_sekolah' => 'nullable',
+            'nik' => 'nullable',
+            'jenis_kelamin' => 'nullable',
+            'tempat_lahir' => 'nullable',
+            'tanggal_lahir' => 'nullable|date',
+            'alamat_lengkap' => 'nullable',
+            'tinggal_bersama' => 'nullable',
+            'no_telp' => 'nullable',
+            'jumlah_saudara' => 'nullable|integer|min:1|max:10',
+            'no_kk' => 'nullable',
+            'nama_ayah' => 'nullable',
+            'nik_ayah' => 'nullable',
+            'pendidikan_ayah' => 'nullable',
+            'pekerjaan_ayah' => 'nullable',
+            'nama_ibu' => 'nullable',
+            'nik_ibu' => 'nullable',
+            'pendidikan_ibu' => 'nullable',
+            'pekerjaan_ibu' => 'nullable',
+            'alamat_ortu' => 'nullable',
         ]);
-
         Ppdb::create($request->all());
-
         return redirect()->back()->with('success', 'Pendaftaran berhasil dikirim!');
     }
     public function fasilitas()

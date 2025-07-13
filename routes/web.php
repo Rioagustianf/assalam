@@ -67,6 +67,8 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/admin/ppdb/export', [AdminController::class, 'exportPpdb'])->name('admin.ppdb.export');
     Route::get('/admin/feedback/export', [AdminController::class, 'exportFeedback'])->name('admin.feedback.export');
+    Route::get('/admin/ppdb/quota', [AdminController::class, 'ppdbQuota'])->name('admin.ppdb.quota');
+    Route::post('/admin/ppdb/quota', [AdminController::class, 'updatePpdbQuota'])->name('admin.ppdb.quota.update');
 });
 
 

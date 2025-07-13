@@ -94,6 +94,14 @@
                 </a>
             </li>
 
+            <!-- Nav Item - Kuota PPDB -->
+            <li class="nav-item {{ request()->routeIs('admin.ppdb.quota') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.ppdb.quota') }}">
+                    <i class="fas fa-fw fa-users-cog"></i>
+                    <span>Pengaturan Kuota PPDB</span>
+                </a>
+            </li>
+
             <!-- Nav Item - Feedback -->
             <li class="nav-item {{ request()->routeIs('admin.feedback') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.feedback') }}">
