@@ -21,6 +21,21 @@
   <link href="{{ asset('assets/css/aos.css') }}" rel="stylesheet">
   <link href="{{ asset('assets/css/jquery.mb.YTPlayer.min.css') }}" rel="stylesheet">
   <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+  <style>
+    /* Override spacing navbar agar navlink tidak terlalu lebar */
+    .site-navbar .container-fluid { padding-left: 2rem; padding-right: 2rem; }
+    .site-navbar .site-navigation .site-menu > li { margin-right: 4px; }
+    .site-navbar .site-navigation .site-menu > li > a { padding: 8px 12px; }
+    /* Spasi antara tombol auth dan ikon sosial */
+    .auth-buttons { margin-right: 12px; }
+    @media (min-width: 992px) {
+      .auth-buttons { margin-right: 16px; }
+      .social-wrap a { margin-left: 6px; }
+    }
+    @media (max-width: 991.98px) {
+      .site-navbar .site-navigation .site-menu > li > a { padding: 8px 10px; }
+    }
+  </style>
 </head>
 
 <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
@@ -57,10 +72,10 @@
           </div>
           <div class="mr-auto">
             <nav class="site-navigation position-relative text-right" role="navigation">
-              <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
+              <ul class="site-menu main-menu js-clone-nav d-lg-block">
               <li><a href="{{ route('index') }}" class="">Beranda</a></li>
               <li>
-                  <a href="{{ route('about') }}" class="nav-link text-left">Profil</a>
+                  <a href="{{ route('about') }}" class="nav-link ">Profil</a>
                 </li>
                 <li>
                   <a href="{{ route('ppdb') }}" class="nav-link text-left">PPDB</a>
@@ -78,17 +93,46 @@
             </nav>
           </div>
 
-          <div class="ml-auto">
-          <div class="social-wrap">
-          <a href="#" class="d-inline-block d-lg-none site-menu-toggle js-menu-toggle text-black">
-          <span class="icon-menu h3"></span>
-            <a href="https://www.facebook.com/profile.php?id=100089124393775"><span class="icon-facebook"></span></a>
-            <a href="https://www.instagram.com/mtsassalam_purwakarta"><span class="icon-instagram"></span></a>
-            <a href="https://youtube.com/@mtsassalamplered"><span class="icon-youtube"></span></a>
-            <a href="https://www.tiktok.com/@mtsassalam.pld.pwk?is_from_webapp=1&sender_device=pc"><span class="fab fa-tiktok"></span></a>
-          </a>
-        </div>
-        </div>
+          <div class="ml-auto d-flex align-items-center justify-content-end flex-grow-1">
+            <!-- Toggle hanya tampil di perangkat kecil -->
+            <div class="mr-3 d-lg-none">
+              <a href="#" class="d-inline-block d-lg-none site-menu-toggle js-menu-toggle text-black">
+                <span class="icon-menu h3"></span>
+              </a>
+            </div>
+
+            <!-- Tombol auth / dropdown user -->
+            <div class="auth-buttons d-flex align-items-center" style="white-space: nowrap;">
+              @auth
+                <div class="dropdown d-inline-flex align-items-center">
+                  <button class="btn btn-sm btn-light text-secondary border-0 dropdown-toggle d-inline-flex align-items-center" type="button" id="userMenuDropdown" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="mr-2">{{ auth()->user()->name }}</span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right dropdown-menu-end" aria-labelledby="userMenuDropdown">
+                    <a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a>
+                    <div class="dropdown-divider"></div>
+                    <form method="POST" action="{{ route('logout') }}" class="px-3 py-1 m-0">
+                      @csrf
+                      <button type="submit" class="btn btn-link p-0 text-danger">Log Out</button>
+                    </form>
+                  </div>
+                </div>
+              @else
+                <a href="{{ route('login') }}" class="btn btn-sm btn-outline-primary mr-2">Login</a>
+                <a href="{{ route('register') }}" class="btn btn-sm btn-primary">Register</a>
+              @endauth
+            </div>
+
+            <!-- Sosial hanya tampil di layar besar agar tidak menumpuk -->
+            <div class="ml-4 social-wrap d-none d-lg-flex align-items-center">
+              <a class="mr-1" href="https://www.facebook.com/profile.php?id=100089124393775"><span class="icon-facebook"></span></a>
+              <a class="mr-1" href="https://www.instagram.com/mtsassalam_purwakarta"><span class="icon-instagram"></span></a>
+              <a class="mr-1" href="https://youtube.com/@mtsassalamplered"><span class="icon-youtube"></span></a>
+              <a class="mr-1" href="https://www.tiktok.com/@mtsassalam.pld.pwk?is_from_webapp=1&sender_device=pc"><span class="fab fa-tiktok"></span></a>
+            </div>
+
+            
+          </div>
 
         </div>
       </div>

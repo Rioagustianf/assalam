@@ -18,6 +18,7 @@ class AdminUserSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@assalam.com',
             'password' => Hash::make('password'),
+            'role' => 'admin',
         ]);
     }
 }

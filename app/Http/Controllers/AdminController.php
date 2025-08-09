@@ -36,6 +36,15 @@ class AdminController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
+            // Pastikan hanya admin yang bisa mengakses area admin
+            if (auth()->user()->role !== 'admin') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Akun ini tidak memiliki akses admin.',
+                ])->onlyInput('email');
+            }
+
             return redirect()->intended('admin/dashboard');
         }
 

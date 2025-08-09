@@ -12,6 +12,16 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('admin.login');
+        if ($request->expectsJson()) {
+            return null;
+        }
+
+        // Arahkan ke halaman login admin jika mengakses rute admin
+        if ($request->routeIs('admin.*') || $request->is('admin/*')) {
+            return route('admin.login');
+        }
+
+        // Default: login user publik (Breeze)
+        return route('login');
     }
 } 
