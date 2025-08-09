@@ -44,7 +44,7 @@
                 {{ __('Sudah punya akun?') }}
             </a>
 
-            <x-primary-button class="ms-4">
+            <x-primary-button class="ms-4 bg-[#50BF78]">
                 {{ __('Daftar') }}
             </x-primary-button>
         </div>

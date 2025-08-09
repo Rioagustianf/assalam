@@ -47,7 +47,7 @@
             <div class="alert alert-info">Kuota tersedia untuk tahun ajaran <b>{{ $tahun_ajaran }}</b>: <b>{{ $sisa }}</b> pendaftar lagi</div>
         @endif
 
-        <form action="{{ route('ppdb.store') }}" method="POST">
+        <form action="{{ route('ppdb.store') }}" method="POST" novalidate>
             @csrf
 
             <div class="form-group">
@@ -56,7 +56,10 @@
             </div>
             <div class="form-group">
                 <label for="nisn">NISN*</label>
-                <input type="text" name="nisn" class="form-control" value="{{ old('nisn') }}" required>
+                <input type="text" name="nisn" class="form-control @error('nisn') is-invalid @enderror" value="{{ old('nisn') }}" inputmode="numeric" pattern="\d{10}" maxlength="10" required>
+                @error('nisn')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="asal_sekolah">Asal Sekolah (SD/MI)</label>
@@ -64,7 +67,10 @@
             </div>
             <div class="form-group">
                 <label for="nik">NIK</label>
-                <input type="text" name="nik" class="form-control" value="{{ old('nik') }}">
+                <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror" value="{{ old('nik') }}" inputmode="numeric" pattern="\d{16}" maxlength="16">
+                @error('nik')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="jenis_kelamin">Jenis Kelamin</label>
@@ -99,7 +105,7 @@
             </div>
             <div class="form-group">
                 <label for="no_telp">No Telpon/WA</label>
-                <input type="text" name="no_telp" class="form-control" value="{{ old('no_telp') }}">
+                <input type="text" name="no_telp" class="form-control" value="{{ old('no_telp') }}" inputmode="numeric" pattern="\d+" maxlength="15">
             </div>
             <div class="form-group">
                 <label for="jumlah_saudara">Jumlah Saudara</label>
@@ -112,7 +118,7 @@
             </div>
             <div class="form-group">
                 <label for="no_kk">Nomor Kartu Keluarga</label>
-                <input type="text" name="no_kk" class="form-control" value="{{ old('no_kk') }}">
+                <input type="text" name="no_kk" class="form-control" value="{{ old('no_kk') }}" inputmode="numeric" pattern="\d{16}" maxlength="16">
             </div>
             <div class="form-group">
                 <label for="nama_ayah">Nama Ayah</label>
@@ -120,7 +126,10 @@
             </div>
             <div class="form-group">
                 <label for="nik_ayah">NIK Ayah</label>
-                <input type="text" name="nik_ayah" class="form-control" value="{{ old('nik_ayah') }}">
+                <input type="text" name="nik_ayah" class="form-control @error('nik_ayah') is-invalid @enderror" value="{{ old('nik_ayah') }}" inputmode="numeric" pattern="\d{16}" maxlength="16">
+                @error('nik_ayah')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="pendidikan_ayah">Pendidikan Ayah</label>
@@ -144,7 +153,10 @@
             </div>
             <div class="form-group">
                 <label for="nik_ibu">NIK Ibu</label>
-                <input type="text" name="nik_ibu" class="form-control" value="{{ old('nik_ibu') }}">
+                <input type="text" name="nik_ibu" class="form-control @error('nik_ibu') is-invalid @enderror" value="{{ old('nik_ibu') }}" inputmode="numeric" pattern="\d{16}" maxlength="16">
+                @error('nik_ibu')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="pendidikan_ibu">Pendidikan Ibu</label>

@@ -46,7 +46,7 @@
             @endif
            
 
-            <x-primary-button class="ms-3">
+            <x-primary-button class="ms-3 bg-[#50BF78]">
                 {{ __('Masuk') }}
             </x-primary-button>
         </div>

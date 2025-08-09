@@ -17,7 +17,7 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
+            <x-primary-button class="bg-[#50BF78]">
                 {{ __('Kirim Tautan Pembaruan Kata Sandi') }}
             </x-primary-button>
         </div>

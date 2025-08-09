@@ -7,6 +7,8 @@ use App\Models\Ppdb;
 use App\Models\Berita;
 use App\Models\PpdbSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class AssalamController extends Controller
 {
@@ -65,30 +67,65 @@ class AssalamController extends Controller
         if ($kuota && $pendaftar >= $kuota) {
             return redirect()->back()->withErrors(['Kuota pendaftaran sudah penuh.'])->withInput();
         }
-        $request->validate([
-            'nama_lengkap' => 'required',
-            'nisn' => 'required',
-            'asal_sekolah' => 'nullable',
-            'nik' => 'nullable',
-            'jenis_kelamin' => 'nullable',
-            'tempat_lahir' => 'nullable',
-            'tanggal_lahir' => 'nullable|date',
-            'alamat_lengkap' => 'nullable',
-            'tinggal_bersama' => 'nullable',
-            'no_telp' => 'nullable',
-            'jumlah_saudara' => 'nullable|integer|min:1|max:10',
-            'no_kk' => 'nullable',
-            'nama_ayah' => 'nullable',
-            'nik_ayah' => 'nullable',
-            'pendidikan_ayah' => 'nullable',
-            'pekerjaan_ayah' => 'nullable',
-            'nama_ibu' => 'nullable',
-            'nik_ibu' => 'nullable',
-            'pendidikan_ibu' => 'nullable',
-            'pekerjaan_ibu' => 'nullable',
-            'alamat_ortu' => 'nullable',
-        ]);
-        Ppdb::create($request->all());
+        // Normalisasi angka-only agar validasi unik konsisten (hapus spasi/tanda baca)
+        $input = $request->all();
+        foreach (['nisn', 'nik', 'nik_ayah', 'nik_ibu', 'no_kk', 'no_telp'] as $field) {
+            if (isset($input[$field]) && $input[$field] !== null) {
+                $input[$field] = preg_replace('/\D/', '', (string) $input[$field]);
+            }
+        }
+
+        // Validasi PPDB
+        $rules = [
+            'nama_lengkap' => ['required', 'string'],
+            'nisn' => [
+                'required',
+                'digits:10',
+                Rule::unique('ppdbs', 'nisn')
+                    ->where(fn($q) => $q->where('created_at', '>=', now()->startOfYear())),
+            ],
+            'asal_sekolah' => ['nullable', 'string'],
+            'nik' => [
+                'nullable',
+                'digits:16',
+                Rule::unique('ppdbs', 'nik')
+                    ->where(fn($q) => $q->where('created_at', '>=', now()->startOfYear())),
+            ],
+            'jenis_kelamin' => ['nullable', Rule::in(['Laki-laki', 'Perempuan'])],
+            'tempat_lahir' => ['nullable', 'string'],
+            'tanggal_lahir' => ['nullable', 'date'],
+            'alamat_lengkap' => ['nullable', 'string'],
+            'tinggal_bersama' => ['nullable', Rule::in(['Orang Tua', 'Wali', 'Pondok Pesantren', 'Asrama', 'Lainnya'])],
+            'no_telp' => ['nullable', 'string'],
+            'jumlah_saudara' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'no_kk' => ['nullable', 'string'],
+            'nama_ayah' => ['nullable', 'string'],
+            'nik_ayah' => ['nullable', 'digits:16'],
+            'pendidikan_ayah' => ['nullable', Rule::in(['Tidak Sekolah', 'Tamat SD/MI', 'Tamat SMP/MTs.', 'Tamat SMA/SMK/MA', 'Diploma', 'S1/S2'])],
+            'pekerjaan_ayah' => ['nullable', 'string'],
+            'nama_ibu' => ['nullable', 'string'],
+            'nik_ibu' => ['nullable', 'digits:16'],
+            'pendidikan_ibu' => ['nullable', Rule::in(['Tidak Sekolah', 'Tamat SD/MI', 'Tamat SMP/MTs.', 'Tamat SMA/SMK/MA', 'Diploma', 'S1/S2'])],
+            'pekerjaan_ibu' => ['nullable', 'string'],
+            'alamat_ortu' => ['nullable', 'string'],
+        ];
+
+        $messages = [
+            'nisn.required' => 'NISN wajib diisi.',
+            'nisn.digits' => 'NISN harus terdiri dari tepat 10 digit angka.',
+            'nisn.unique' => 'NISN sudah terdaftar pada tahun ajaran berjalan.',
+            'nik.digits' => 'NIK harus terdiri dari tepat 16 digit angka.',
+            'nik.unique' => 'NIK sudah terdaftar pada tahun ajaran berjalan.',
+            'nik_ayah.digits' => 'NIK Ayah harus 16 digit angka.',
+            'nik_ibu.digits' => 'NIK Ibu harus 16 digit angka.',
+        ];
+
+        $validator = Validator::make($input, $rules, $messages);
+
+        // Tidak ada validasi lanjutan untuk NIK (hanya 16 digit)
+
+        $validated = $validator->validate();
+        Ppdb::create($validated);
         return redirect()->back()->with('success', 'Pendaftaran berhasil dikirim!');
     }
     public function fasilitas()

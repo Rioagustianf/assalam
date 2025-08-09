@@ -31,7 +31,7 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
+            <x-primary-button class="bg-[#50BF78]">
                 {{ __('Reset Password') }}
             </x-primary-button>
         </div>
