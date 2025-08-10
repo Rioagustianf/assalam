@@ -12,7 +12,24 @@
         <!-- Email Address -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+            <x-text-input 
+                id="email" 
+                class="block mt-1 w-full @error('email') border-red-500 ring-2 ring-red-200 @enderror" 
+                type="email" 
+                name="email" 
+                :value="old('email')" 
+                required 
+                autocomplete="username" 
+            />
+            <div class="flex items-center mt-2">
+                <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01" />
+                </svg>
+                <span class="text-sm text-red-600 font-medium bg-red-50 py-1 rounded-lg shadow-sm">
+                    Isi email dengan benar
+                </span>
+            </div>
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 

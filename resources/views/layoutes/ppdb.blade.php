@@ -74,16 +74,20 @@
                 
         </div>
 
-        <div class="site-section bg-light">
-    <div class="container text-center">
-        <h3 class="mb-4">Siap mendaftar?</h3>
-        <a href="{{ route('ppdb.form') }}" class="btn btn-primary btn-lg px-5 py-3">
-    Daftar Sekarang
-</a>
-
+    <div class="site-section bg-light">
+        <div class="container text-center">
+            <h3 class="mb-4">Siap mendaftar?</h3>
+            @auth
+                <a href="{{ route('ppdb.form') }}" class="btn btn-primary btn-lg px-5 py-3 mb-2">Daftar Sekarang</a>
+            @else
+                <div class="d-inline-flex flex-column flex-sm-row align-items-center justify-content-center">
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary btn-lg px-4 py-3 mb-2 mb-sm-0 mr-sm-2">Login</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary btn-lg px-4 py-3">Register</a>
+                </div>
+                <p class="mt-3 text-muted">Silakan login atau register terlebih dahulu untuk melanjutkan pendaftaran.</p>
+            @endauth
+        </div>
     </div>
 </div>
-
-    </div>
 
 @endsection        

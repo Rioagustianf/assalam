@@ -118,8 +118,7 @@
                   </div>
                 </div>
               @else
-                <a href="{{ route('login') }}" class="btn btn-sm btn-outline-primary mr-2">Login</a>
-                <a href="{{ route('register') }}" class="btn btn-sm btn-primary">Register</a>
+                {{-- Login/Register dipindahkan ke halaman PPDB (bagian "Siap mendaftar?") --}}
               @endauth
             </div>
 
