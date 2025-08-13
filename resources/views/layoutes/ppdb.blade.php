@@ -77,12 +77,64 @@
     <div class="site-section bg-light">
         <div class="container text-center">
             <h3 class="mb-4">Siap mendaftar?</h3>
+            
             @auth
-                <a href="{{ route('ppdb.form') }}" class="btn btn-primary btn-lg px-5 py-3 mb-2">Daftar Sekarang</a>
+                @if($ppdbStatus)
+                    <!-- User sudah mendaftar PPDB -->
+                    <div class="card border-success mx-auto" style="max-width: 500px;">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-check-circle mr-2"></i>Pendaftaran Berhasil</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-left">
+                                <div class="col-6">
+                                    <strong>Nama:</strong><br>
+                                    <strong>NISN:</strong><br>
+                                    <strong>Tahun Ajaran:</strong><br>
+                                    <strong>Tanggal Daftar:</strong><br>
+                                    <strong>Status:</strong>
+                                </div>
+                                <div class="col-6">
+                                    {{ $ppdbStatus->nama_lengkap }}<br>
+                                    {{ $ppdbStatus->nisn }}<br>
+                                    {{ $ppdbStatus->tahun_ajaran }}<br>
+                                    {{ $ppdbStatus->created_at->format('d/m/Y H:i') }}<br>
+                                    <span class="badge badge-warning">Menunggu Verifikasi</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Pendaftaran Anda telah berhasil diterima. Tim kami akan melakukan verifikasi dan menghubungi Anda segera.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-secondary btn-lg px-4 py-2" disabled>
+                            <i class="fas fa-check mr-2"></i>Sudah Terdaftar
+                        </button>
+                    </div>
+                @else
+                    <!-- User belum mendaftar PPDB -->
+                    <div class="alert alert-info mx-auto" style="max-width: 500px;">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Anda belum mendaftar PPDB untuk tahun ajaran {{ $tahunAjaran }}.
+                    </div>
+                    
+                    <a href="{{ route('ppdb.form') }}" class="btn btn-primary btn-lg px-5 py-3 mb-2">
+                        <i class="fas fa-edit mr-2"></i>Daftar Sekarang
+                    </a>
+                @endif
             @else
+                <!-- User belum login -->
                 <div class="d-inline-flex flex-column flex-sm-row align-items-center justify-content-center">
-                    <a href="{{ route('login') }}" class="btn btn-outline-primary btn-lg px-4 py-3 mb-2 mb-sm-0 mr-sm-2">Login</a>
-                    <a href="{{ route('register') }}" class="btn btn-primary btn-lg px-4 py-3">Register</a>
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary btn-lg px-4 py-3 mb-2 mb-sm-0 mr-sm-2">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </a>
+                    <a href="{{ route('register') }}" class="btn btn-primary btn-lg px-4 py-3">
+                        <i class="fas fa-user-plus mr-2"></i>Register
+                    </a>
                 </div>
                 <p class="mt-3 text-muted">Silakan login atau register terlebih dahulu untuk melanjutkan pendaftaran.</p>
             @endauth

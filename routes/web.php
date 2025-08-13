@@ -11,9 +11,7 @@ Route::get('/about', function () {
     return view('layoutes.about');
 })->name('about');
 
-Route::get('/ppdb', function () {
-    return view('layoutes.ppdb');
-})->name('ppdb');
+Route::get('/ppdb', [AssalamController::class, 'ppdb'])->name('ppdb');
 
 Route::get('/pembelajaran', function () {
     return view('layoutes.pembelajaran');
@@ -46,6 +44,7 @@ Route::post('/feedback', [AssalamController::class, 'storeFeedback'])->name('fee
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/ppdb/daftar', [AssalamController::class, 'ppdbForm'])->name('ppdb.form');
     Route::post('/ppdb/daftar', [AssalamController::class, 'storePpdb'])->name('ppdb.store');
+    Route::get('/ppdb/status', [AssalamController::class, 'checkPpdbStatus'])->name('ppdb.status');
 });
 
 // Halaman info fasilitas & kegiatan

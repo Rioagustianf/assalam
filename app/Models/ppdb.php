@@ -10,6 +10,8 @@ class ppdb extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
+        'tahun_ajaran',
         'nama_lengkap',
         'nisn',
         'asal_sekolah',
@@ -32,4 +34,12 @@ class ppdb extends Model
         'pekerjaan_ibu',
         'alamat_ortu',
     ];
+
+    /**
+     * Relasi dengan User
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

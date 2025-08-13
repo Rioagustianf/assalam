@@ -53,20 +53,44 @@ class AssalamController extends Controller
     // Untuk halaman form PPDB
     public function ppdbForm()
     {
+        // Cek apakah user sudah pernah mendaftar PPDB
+        $currentYear = now()->year;
+        $tahunAjaran = ($currentYear - 1) . '/' . $currentYear;
+        
+        $existingPpdb = Ppdb::where('user_id', auth()->id())
+                            ->where('tahun_ajaran', $tahunAjaran)
+                            ->first();
+        
+        if ($existingPpdb) {
+            return redirect()->route('ppdb')->with('error', 'Anda sudah pernah mendaftar PPDB untuk tahun ajaran ' . $tahunAjaran . '.');
+        }
+        
         return view('pages.ppdb-form');
     }
 
     // Simpan data PPDB
     public function storePpdb(Request $request)
     {
+        // Cek apakah user sudah pernah mendaftar PPDB
+        $currentYear = now()->year;
+        $tahunAjaran = ($currentYear - 1) . '/' . $currentYear;
+        
+        $existingPpdb = Ppdb::where('user_id', auth()->id())
+                            ->where('tahun_ajaran', $tahunAjaran)
+                            ->first();
+        
+        if ($existingPpdb) {
+            return redirect()->back()->withErrors(['error' => 'Anda sudah pernah mendaftar PPDB untuk tahun ajaran ' . $tahunAjaran . '.'])->withInput();
+        }
+
         // Cek kuota
         $setting = PpdbSetting::orderByDesc('id')->first();
         $kuota = $setting ? $setting->kuota : null;
-        $tahun_ajaran = $setting ? $setting->tahun_ajaran : null;
-        $pendaftar = $tahun_ajaran ? Ppdb::where('created_at', '>=', now()->startOfYear())->count() : 0;
+        $pendaftar = Ppdb::where('tahun_ajaran', $tahunAjaran)->count();
         if ($kuota && $pendaftar >= $kuota) {
             return redirect()->back()->withErrors(['Kuota pendaftaran sudah penuh.'])->withInput();
         }
+
         // Normalisasi angka-only agar validasi unik konsisten (hapus spasi/tanda baca)
         $input = $request->all();
         foreach (['nisn', 'nik', 'nik_ayah', 'nik_ibu', 'no_kk', 'no_telp'] as $field) {
@@ -82,14 +106,14 @@ class AssalamController extends Controller
                 'required',
                 'digits:10',
                 Rule::unique('ppdbs', 'nisn')
-                    ->where(fn($q) => $q->where('created_at', '>=', now()->startOfYear())),
+                    ->where(fn($q) => $q->where('tahun_ajaran', $tahunAjaran)),
             ],
             'asal_sekolah' => ['nullable', 'string'],
             'nik' => [
                 'nullable',
                 'digits:16',
                 Rule::unique('ppdbs', 'nik')
-                    ->where(fn($q) => $q->where('created_at', '>=', now()->startOfYear())),
+                    ->where(fn($q) => $q->where('tahun_ajaran', $tahunAjaran)),
             ],
             'jenis_kelamin' => ['nullable', Rule::in(['Laki-laki', 'Perempuan'])],
             'tempat_lahir' => ['nullable', 'string'],
@@ -125,6 +149,11 @@ class AssalamController extends Controller
         // Tidak ada validasi lanjutan untuk NIK (hanya 16 digit)
 
         $validated = $validator->validate();
+        
+        // Tambah user_id dan tahun_ajaran
+        $validated['user_id'] = auth()->id();
+        $validated['tahun_ajaran'] = $tahunAjaran;
+        
         Ppdb::create($validated);
         return redirect()->back()->with('success', 'Pendaftaran berhasil dikirim!');
     }
@@ -173,5 +202,55 @@ class AssalamController extends Controller
     public function adminDashboard()
     {
         return view('admin.dashboard');
+    }
+
+    public function ppdb()
+    {
+        // Cek status pendaftaran PPDB untuk user yang sudah login
+        $ppdbStatus = null;
+        $tahunAjaran = null;
+        
+        if (auth()->check()) {
+            $currentYear = now()->year;
+            $tahunAjaran = ($currentYear - 1) . '/' . $currentYear;
+            
+            $ppdbStatus = Ppdb::where('user_id', auth()->id())
+                              ->where('tahun_ajaran', $tahunAjaran)
+                              ->first();
+        }
+        
+        return view('layoutes.ppdb', compact('ppdbStatus', 'tahunAjaran'));
+    }
+
+    /**
+     * Cek status pendaftaran PPDB user
+     */
+    public function checkPpdbStatus()
+    {
+        if (!auth()->check()) {
+            return response()->json(['status' => 'not_logged_in']);
+        }
+        
+        $currentYear = now()->year;
+        $tahunAjaran = ($currentYear - 1) . '/' . $currentYear;
+        
+        $ppdb = Ppdb::where('user_id', auth()->id())
+                    ->where('tahun_ajaran', $tahunAjaran)
+                    ->first();
+        
+        if ($ppdb) {
+            return response()->json([
+                'status' => 'already_registered',
+                'data' => [
+                    'nama_lengkap' => $ppdb->nama_lengkap,
+                    'nisn' => $ppdb->nisn,
+                    'tahun_ajaran' => $ppdb->tahun_ajaran,
+                    'created_at' => $ppdb->created_at->format('d/m/Y H:i'),
+                    'status' => 'Menunggu Verifikasi'
+                ]
+            ]);
+        }
+        
+        return response()->json(['status' => 'not_registered']);
     }
 }
